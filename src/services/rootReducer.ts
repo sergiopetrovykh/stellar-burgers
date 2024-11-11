@@ -1,7 +1,7 @@
 import { combineReducers } from '@reduxjs/toolkit';
 import ingredientsReducer from './slices/ingredientsSlice';
 import userReducer from './slices/userSlice';
-import ordersReducer from './slices/ordersSlice';
+import ordersReducer from './slices/orderSlice';
 
 // Объединяем редьюсеры в один корневой редьюсер
 const rootReducer = combineReducers({
