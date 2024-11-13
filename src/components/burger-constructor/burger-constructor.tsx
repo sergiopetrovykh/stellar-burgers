@@ -1,44 +1,38 @@
 import { FC, useMemo } from 'react';
 import { TConstructorIngredient, TIngredient } from '@utils-types';
 import { BurgerConstructorUI } from '@ui';
-import { useDispatch, useSelector } from '../../services/store';
+import { useSelector, useDispatch } from 'react-redux';
+import { RootState } from '../../services/rootReducer';
 
 export const BurgerConstructor: FC = () => {
-  /** TODO: взять переменные constructorItems, orderRequest и orderModalData из стора */
-  const { error, ingredients } = useSelector((state) => state.basket);
-  const constructorItems = {
-    bun: {
-      price: 0
-    },
-    ingredients
-  };
+  // Извлекаем состояние, учитывая, что bun и ingredients находятся внутри constructorItems
+  const { error, constructorItems, orderRequest, orderModalData } = useSelector(
+    (state: RootState) => state.constructor
+  );
 
-  const orderRequest = false;
-
-  const orderModalData = null;
+  const { bun, ingredients } = constructorItems; // Деструктурируем bun и ingredients из constructorItems
 
   const onOrderClick = () => {
-    if (!constructorItems.bun || orderRequest) return;
+    if (!bun || orderRequest) return;
+    // Здесь можно добавить логику отправки заказа
   };
-  const closeOrderModal = () => {};
+
+  const closeOrderModal = () => {
+    // Логика для закрытия модального окна
+  };
 
   const price = useMemo(
     () =>
-      (constructorItems.bun ? constructorItems.bun.price * 2 : 0) +
-      constructorItems.ingredients.reduce(
-        (s: number, v: TIngredient) => s + v.price,
-        0
-      ),
-    [constructorItems]
+      (bun ? bun.price * 2 : 0) +
+      ingredients.reduce((s: number, v: TIngredient) => s + v.price, 0),
+    [bun, ingredients]
   );
-
-  //return null;
 
   return (
     <BurgerConstructorUI
       price={price}
       orderRequest={orderRequest}
-      constructorItems={constructorItems}
+      constructorItems={{ bun, ingredients }}
       orderModalData={orderModalData}
       onOrderClick={onOrderClick}
       closeOrderModal={closeOrderModal}

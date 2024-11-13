@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom';
 
 import { BurgerIngredientUI } from '@ui';
 import { TBurgerIngredientProps } from './type';
-import { addIngredient } from '../../services/slices/basketReducer';
+import { addIngredientToBasket } from '../../services/slices/constructorSlice';
 import { useDispatch } from 'react-redux';
 
 export const BurgerIngredient: FC<TBurgerIngredientProps> = memo(
@@ -12,7 +12,7 @@ export const BurgerIngredient: FC<TBurgerIngredientProps> = memo(
     const dispatch = useDispatch();
 
     const handleAdd = () => {
-      dispatch(addIngredient(ingredient));
+      dispatch(addIngredientToBasket(ingredient));
     };
 
     return (

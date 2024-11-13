@@ -1,4 +1,4 @@
-import {
+/* import {
   createSlice,
   createAsyncThunk,
   createAction,
@@ -16,10 +16,6 @@ const initialState: BasketState = {
   ingredients: [],
   error: null
 };
-
-/* const addIngredient = createAction<TIngredient, 'ADD_INGREDIENT'>(
-  'ADD_INGREDIENT'
-); */
 
 const basketSlice = createSlice({
   name: 'basket',
@@ -39,3 +35,4 @@ export const { addIngredient } = basketSlice.actions;
 export const { getBasketSelector } = basketSlice.selectors;
 
 export default basketSlice.reducer;
+ */
