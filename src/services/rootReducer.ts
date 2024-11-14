@@ -7,7 +7,7 @@ import constructorSlice from './slices/constructorSlice';
 
 // Объединяем редьюсеры в один корневой редьюсер
 const rootReducer = combineReducers({
-  constructor: constructorSlice,
+  constructorBurg: constructorSlice,
   ingredients: ingredientsReducer,
   user: userReducer,
   orders: ordersReducer,

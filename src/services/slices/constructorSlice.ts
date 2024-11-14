@@ -86,7 +86,11 @@ const constructorSlice = createSlice({
 
     // Добавление ингредиента в корзину
     addIngredientToBasket: (state, action: PayloadAction<TIngredient>) => {
-      state.basket.ingredients.push(action.payload);
+      if (action.payload.type === 'bun') {
+        state.basket.ingredients.push(action.payload);
+      } else {
+        state.basket.ingredients.push(action.payload);
+      }
     },
 
     // Установка ошибки для корзины

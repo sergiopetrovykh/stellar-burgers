@@ -7,7 +7,7 @@ import { RootState } from '../../services/rootReducer';
 export const BurgerConstructor: FC = () => {
   // Извлекаем состояние, учитывая, что bun и ingredients находятся внутри constructorItems
   const { error, constructorItems, orderRequest, orderModalData } = useSelector(
-    (state: RootState) => state.constructor
+    (state: RootState) => state.constructorBurg
   );
 
   const onOrderClick = () => {
