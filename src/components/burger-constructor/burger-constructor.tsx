@@ -10,10 +10,8 @@ export const BurgerConstructor: FC = () => {
     (state: RootState) => state.constructor
   );
 
-  const { bun, ingredients } = constructorItems; // Деструктурируем bun и ingredients из constructorItems
-
   const onOrderClick = () => {
-    if (!bun || orderRequest) return;
+    if (constructorItems.bun || orderRequest) return;
     // Здесь можно добавить логику отправки заказа
   };
 
@@ -23,16 +21,19 @@ export const BurgerConstructor: FC = () => {
 
   const price = useMemo(
     () =>
-      (bun ? bun.price * 2 : 0) +
-      ingredients.reduce((s: number, v: TIngredient) => s + v.price, 0),
-    [bun, ingredients]
+      (constructorItems.bun ? constructorItems.bun?.price * 2 : 0) +
+      constructorItems.ingredients.reduce(
+        (s: number, v: TIngredient) => s + v.price,
+        0
+      ),
+    [constructorItems?.bun, constructorItems?.ingredients]
   );
 
   return (
     <BurgerConstructorUI
       price={price}
       orderRequest={orderRequest}
-      constructorItems={{ bun, ingredients }}
+      constructorItems={constructorItems}
       orderModalData={orderModalData}
       onOrderClick={onOrderClick}
       closeOrderModal={closeOrderModal}
