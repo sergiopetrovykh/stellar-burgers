@@ -42,12 +42,12 @@ const initialState: TConstructorState = {
 
 // Асинхронный thunk для отправки заказа
 export const sendOrderThunk = createAsyncThunk(
-  'constructor/sendOrder',
+  'constructorBurg/sendOrder',
   (data: string[]) => orderBurgerApi(data)
 );
 
 const constructorSlice = createSlice({
-  name: 'constructor',
+  name: 'constructorBurg',
   initialState,
   reducers: {
     // Добавление ингредиента в конструктор
@@ -59,17 +59,18 @@ const constructorSlice = createSlice({
           state.constructorItems.ingredients.push(action.payload);
         }
       },
-      prepare: (ingredient: TIngredient) => {
-        const id = uuidv4();
-        return { payload: { ...ingredient, id } };
-      }
+      prepare: (ingredient: TIngredient) => ({
+        payload: { ...ingredient, id: nanoid() },
+        error: null,
+        meta: null
+      })
     },
 
     // Удаление ингредиента из конструктора
-    deleteItem: (state, action: PayloadAction<string>) => {
+    deleteItem: (state, action: PayloadAction<number>) => {
       state.constructorItems.ingredients =
         state.constructorItems.ingredients.filter(
-          (item) => item.id !== action.payload
+          (ingredient) => ingredient.id !== String(action.payload)
         );
     },
 
@@ -87,9 +88,15 @@ const constructorSlice = createSlice({
     // Добавление ингредиента в корзину
     addIngredientToBasket: (state, action: PayloadAction<TIngredient>) => {
       if (action.payload.type === 'bun') {
-        state.basket.ingredients.push(action.payload);
+        state.constructorItems.bun = {
+          ...action.payload,
+          id: action.payload._id
+        };
       } else {
-        state.basket.ingredients.push(action.payload);
+        state.constructorItems.ingredients.push({
+          ...action.payload,
+          id: action.payload._id
+        });
       }
     },
 
