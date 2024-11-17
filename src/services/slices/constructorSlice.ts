@@ -6,34 +6,23 @@ import {
 } from '@reduxjs/toolkit';
 import { TConstructorIngredient, TIngredient, TOrder } from '@utils-types';
 import { orderBurgerApi, getOrderByNumberApi } from '@api';
-import { v4 as uuidv4 } from 'uuid';
 
-// Тип состояния
-type TConstructorState = {
+export interface constructorState {
   isLoading: boolean;
   constructorItems: {
     bun: TConstructorIngredient | null;
     ingredients: TConstructorIngredient[];
   };
-  basket: {
-    ingredients: TIngredient[];
-    error: string | null;
-  };
   orderRequest: boolean;
   orderModalData: TOrder | null;
   error: string | null;
-};
+}
 
-// Начальное состояние
-const initialState: TConstructorState = {
+const initialState: constructorState = {
   isLoading: false,
   constructorItems: {
     bun: null,
     ingredients: []
-  },
-  basket: {
-    ingredients: [],
-    error: null
   },
   orderRequest: false,
   orderModalData: null,
@@ -51,8 +40,8 @@ const constructorSlice = createSlice({
   initialState,
   reducers: {
     // Добавление ингредиента в конструктор
-    addItem: {
-      reducer: (state, action: PayloadAction<TConstructorIngredient>) => {
+    addIngredientToBasket: {
+      reducer: (state, action) => {
         if (action.payload.type === 'bun') {
           state.constructorItems.bun = action.payload;
         } else {
@@ -67,42 +56,11 @@ const constructorSlice = createSlice({
     },
 
     // Удаление ингредиента из конструктора
-    deleteItem: (state, action: PayloadAction<number>) => {
+    deleteIngredientFromBasket: (state, action) => {
       state.constructorItems.ingredients =
         state.constructorItems.ingredients.filter(
-          (ingredient) => ingredient.id !== String(action.payload)
+          (ingredient) => ingredient.id != action.payload
         );
-    },
-
-    // Очистка всех ингредиентов
-    clearAll: (state) => {
-      state.constructorItems.bun = null;
-      state.constructorItems.ingredients = [];
-    },
-
-    // Обновление всех ингредиентов в конструкторе
-    updateAll: (state, action: PayloadAction<TConstructorIngredient[]>) => {
-      state.constructorItems.ingredients = action.payload;
-    },
-
-    // Добавление ингредиента в корзину
-    addIngredientToBasket: (state, action: PayloadAction<TIngredient>) => {
-      if (action.payload.type === 'bun') {
-        state.constructorItems.bun = {
-          ...action.payload,
-          id: action.payload._id
-        };
-      } else {
-        state.constructorItems.ingredients.push({
-          ...action.payload,
-          id: action.payload._id
-        });
-      }
-    },
-
-    // Установка ошибки для корзины
-    setBasketError: (state, action: PayloadAction<string | null>) => {
-      state.basket.error = action.payload;
     },
 
     // Установка состояния запроса заказа
@@ -115,17 +73,6 @@ const constructorSlice = createSlice({
       state.orderModalData = null;
     },
 
-    // Перемещение ингредиента вниз
-    moveIngredientDown: (state, action: PayloadAction<number>) => {
-      [
-        state.constructorItems.ingredients[action.payload],
-        state.constructorItems.ingredients[action.payload + 1]
-      ] = [
-        state.constructorItems.ingredients[action.payload + 1],
-        state.constructorItems.ingredients[action.payload]
-      ];
-    },
-
     // Перемещение ингредиента вверх
     moveIngredientUp: (state, action: PayloadAction<number>) => {
       [
@@ -135,9 +82,22 @@ const constructorSlice = createSlice({
         state.constructorItems.ingredients[action.payload - 1],
         state.constructorItems.ingredients[action.payload]
       ];
+    },
+
+    // Перемещение ингредиента вниз
+    moveIngredientDown: (state, action: PayloadAction<number>) => {
+      [
+        state.constructorItems.ingredients[action.payload],
+        state.constructorItems.ingredients[action.payload + 1]
+      ] = [
+        state.constructorItems.ingredients[action.payload + 1],
+        state.constructorItems.ingredients[action.payload]
+      ];
     }
   },
-
+  selectors: {
+    getConstructorSelector: (state) => state
+  },
   extraReducers: (builder) => {
     builder
       .addCase(sendOrderThunk.pending, (state) => {
@@ -160,30 +120,17 @@ const constructorSlice = createSlice({
       });
   }
 });
+export const { getConstructorSelector } = constructorSlice.selectors;
 
 // Экспорт действий
 export const {
-  addItem,
-  deleteItem,
-  clearAll,
-  updateAll,
-  addIngredientToBasket,
-  setBasketError,
+  addIngredientToBasket, //добавили ингредиент в корзину
+  deleteIngredientFromBasket, //удалили ингредиент из корзины
   setOrderRequest,
   setNullOrderModalData,
-  moveIngredientDown,
-  moveIngredientUp
+  moveIngredientUp,
+  moveIngredientDown
 } = constructorSlice.actions;
-
-// Экспорт селекторов
-export const selectBun = (state: TConstructorState) =>
-  state.constructorItems.bun;
-export const selectConstructorIngredients = (state: TConstructorState) =>
-  state.constructorItems.ingredients;
-export const selectBasketIngredients = (state: TConstructorState) =>
-  state.basket.ingredients;
-export const selectBasketError = (state: TConstructorState) =>
-  state.basket.error;
 
 // Экспорт редюсера
 export default constructorSlice.reducer;
