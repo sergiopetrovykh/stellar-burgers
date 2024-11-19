@@ -12,21 +12,14 @@ export const ProtectedRoute: FC<ProtectedRouteProps> = ({
   children,
   onlyUnAuth
 }) => {
-  const dispatch = useDispatch();
-  const isAuthenticated = useSelector(
-    (state: any) => state.auth.isAuthenticated
-  );
+  const isAuthorized = useSelector((state: any) => state.user.isAuthorized);
   const location = useLocation();
 
-  useEffect(() => {
-    //dispatch(checkAuthStatus());
-  }, [dispatch]);
-
-  if (onlyUnAuth && isAuthenticated) {
+  if (onlyUnAuth && isAuthorized) {
     return <Navigate to={location.state?.from?.pathname || '/'} />;
   }
 
-  if (!isAuthenticated && !onlyUnAuth) {
+  if (!isAuthorized && !onlyUnAuth) {
     return <Navigate to='/login' state={{ from: location }} />;
   }
 

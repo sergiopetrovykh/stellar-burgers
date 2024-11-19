@@ -4,6 +4,7 @@ import userReducer from './slices/userSlice';
 import ordersReducer from './slices/orderSlice';
 import basketReducer from './slices/constructorSlice';
 import constructorSlice from './slices/constructorSlice';
+import feedReducer from './slices/feed';
 
 // Объединяем редьюсеры в один корневой редьюсер
 const rootReducer = combineReducers({
@@ -11,7 +12,8 @@ const rootReducer = combineReducers({
   ingredients: ingredientsReducer,
   user: userReducer,
   orders: ordersReducer,
-  basket: basketReducer
+  basket: basketReducer,
+  feed: feedReducer
 });
 
 // Экспортируем тип для состояния

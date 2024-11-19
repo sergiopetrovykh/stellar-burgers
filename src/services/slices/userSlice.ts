@@ -1,65 +1,3 @@
-/* import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { RootState } from '../store'; // Импортируйте RootState из store.ts
-
-interface User {
-  id: string;
-  name: string;
-  email: string;
-}
-
-interface UserState {
-  user: User | null;
-  isAuthenticated: boolean;
-  isLoading: boolean;
-  error: string | null;
-}
-
-const initialState: UserState = {
-  user: null,
-  isAuthenticated: false,
-  isLoading: false,
-  error: null
-};
-
-const userSlice = createSlice({
-  name: 'user',
-  initialState,
-  reducers: {
-    loginStart(state) {
-      state.isLoading = true;
-      state.error = null;
-    },
-    loginSuccess(state, action: PayloadAction<User>) {
-      state.isLoading = false;
-      state.isAuthenticated = true;
-      state.user = action.payload;
-    },
-    loginFailure(state, action: PayloadAction<string>) {
-      state.isLoading = false;
-      state.error = action.payload;
-    },
-    logout(state) {
-      state.isAuthenticated = false;
-      state.user = null;
-    }
-  }
-});
-
-// Экспортируем действия для использования в компонентах
-export const { loginStart, loginSuccess, loginFailure, logout } =
-  userSlice.actions;
-
-// Экспортируем селекторы для доступа к данным состояния
-export const selectIsAuthenticated = (state: RootState) =>
-  state.user.isAuthenticated;
-export const selectUser = (state: RootState) => state.user.user;
-export const selectUserName = (state: RootState) => state.user.user?.name;
-export const selectUserError = (state: RootState) => state.user.error;
-export const selectIsLoading = (state: RootState) => state.user.isLoading;
-
-// Экспортируем редьюсер для подключения в rootReducer
-export default userSlice.reducer;
- */
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import {
   registerUserApi,
@@ -67,7 +5,6 @@ import {
   getUserApi,
   updateUserApi,
   logoutApi,
-  refreshToken,
   forgotPasswordApi,
   resetPasswordApi
 } from '@api';

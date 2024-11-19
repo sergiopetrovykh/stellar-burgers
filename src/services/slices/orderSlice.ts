@@ -14,6 +14,7 @@ const initialState: OrderState = {
   error: null
 };
 
+// Асинхронный thunk для получения заказа по номеру
 export const getOrderThunk = createAsyncThunk(
   'feed/getOrder',
   (number: number) => getOrderByNumberApi(number)
@@ -23,9 +24,6 @@ const orderSlice = createSlice({
   name: 'order',
   initialState,
   reducers: {},
-  selectors: {
-    getOrderSelector: (state) => state
-  },
   extraReducers: (builder) => {
     builder
       .addCase(getOrderThunk.pending, (state) => {
@@ -44,7 +42,8 @@ const orderSlice = createSlice({
   }
 });
 
-export { initialState as orderInitialState };
-export const { getOrderSelector } = orderSlice.selectors;
+// Селектор для получения состояния `order`
+export const getOrderSelector = (state: { orders: OrderState }) => state.orders;
 
+// Экспорт редюсера
 export default orderSlice.reducer;

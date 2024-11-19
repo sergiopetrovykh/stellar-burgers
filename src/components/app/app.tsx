@@ -12,25 +12,33 @@ import {
 import '../../index.css';
 import styles from './app.module.css';
 import { ProtectedRoute } from '../protected-route/protected-route';
-
+import { useDispatch } from '../../services/store';
 import { AppHeader, IngredientDetails, Modal, OrderInfo } from '@components';
-import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
+import {
+  Route,
+  Routes,
+  useLocation,
+  useNavigate,
+  useParams
+} from 'react-router-dom';
 
 import { useEffect } from 'react';
+
+import { fetchIngredients, getUserThunk } from '@slices';
 
 const App = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  //const dispatch = useDispatch();
+  const dispatch = useDispatch();
 
   // Фоновое состояние для модальных окон
   const background = location.state?.background;
 
-  /*  useEffect(() => {
-    dispatch(getUser());
-    dispatch(getIngredients());
+  useEffect(() => {
+    dispatch(getUserThunk());
+    dispatch(fetchIngredients());
   }, [dispatch]);
- */
+
   return (
     <div className={styles.app}>
       <AppHeader />
@@ -114,7 +122,7 @@ const App = () => {
             path='/feed/:number'
             element={
               <Modal
-                title={`#${location.pathname.match(/\d+/)}`}
+                title={`#${useParams().number}`} // Использование useParams
                 onClose={() => navigate(-1)}
               >
                 <OrderInfo />
@@ -125,7 +133,7 @@ const App = () => {
             path='/profile/orders/:number'
             element={
               <Modal
-                title={`#${location.pathname.match(/\d+/)}`}
+                title={`#${useParams().number}`} // Использование useParams
                 onClose={() => navigate(-1)}
               >
                 <OrderInfo />
