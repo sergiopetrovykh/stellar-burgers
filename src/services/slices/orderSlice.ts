@@ -17,7 +17,7 @@ const initialState: OrderState = {
 // Асинхронный thunk для получения заказа по номеру
 export const getOrderThunk = createAsyncThunk(
   'feed/getOrder',
-  (number: number) => getOrderByNumberApi(number)
+  getOrderByNumberApi
 );
 
 const orderSlice = createSlice({

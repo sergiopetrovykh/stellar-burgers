@@ -1,7 +1,9 @@
-import React, { FC, useEffect } from 'react';
+/* eslint-disable prettier/prettier */
+import React, { FC } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
-// import { checkAuthStatus } from '../../services/slices/user';
+import { useSelector } from 'react-redux';
+import { isAuthorizedSelector, getRequestUser } from '@slices';
+import { Preloader } from '@ui';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -12,16 +14,30 @@ export const ProtectedRoute: FC<ProtectedRouteProps> = ({
   children,
   onlyUnAuth
 }) => {
-  const isAuthorized = useSelector((state: any) => state.user.isAuthorized);
+  const isAuthorized = useSelector(isAuthorizedSelector); // Проверяем авторизацию
+  const isUserLoading = useSelector(getRequestUser); // Проверяем состояние загрузки пользователя
   const location = useLocation();
 
+  // Если данные пользователя ещё загружаются, отображаем прелоадер
+  if (isUserLoading) {
+    return <Preloader />;
+  }
+
   if (onlyUnAuth && isAuthorized) {
-    return <Navigate to={location.state?.from?.pathname || '/'} />;
+    return (
+      <Navigate to={location.state?.from?.pathname || '/'} />
+    );
   }
 
   if (!isAuthorized && !onlyUnAuth) {
-    return <Navigate to='/login' state={{ from: location }} />;
+    return (
+      <Navigate to='/login' state={{ from: location }} />
+    );
   }
 
-  return <>{children}</>;
+  return (
+    <>
+      {children}
+    </>
+  );
 };
