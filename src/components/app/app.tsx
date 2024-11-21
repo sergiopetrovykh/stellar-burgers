@@ -123,8 +123,7 @@ const App = () => {
             element={
               <Modal
                 title={`#${useParams().number}`} // Использование useParams
-                onClose={() => navigate(-1)}
-              >
+                onClose={() => navigate(-1)}>
                 <OrderInfo />
               </Modal>
             }
@@ -134,8 +133,7 @@ const App = () => {
             element={
               <Modal
                 title={`#${useParams().number}`} // Использование useParams
-                onClose={() => navigate(-1)}
-              >
+                onClose={() => navigate(-1)}>
                 <OrderInfo />
               </Modal>
             }
