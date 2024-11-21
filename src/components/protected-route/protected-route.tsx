@@ -24,20 +24,12 @@ export const ProtectedRoute: FC<ProtectedRouteProps> = ({
   }
 
   if (onlyUnAuth && isAuthorized) {
-    return (
-      <Navigate to={location.state?.from?.pathname || '/'} />
-    );
+    return <Navigate to={location.state?.from?.pathname || '/'} />;
   }
 
   if (!isAuthorized && !onlyUnAuth) {
-    return (
-      <Navigate to='/login' state={{ from: location }} />
-    );
+    return <Navigate to='/login' state={{ from: location }} />;
   }
 
-  return (
-    <>
-      {children}
-    </>
-  );
+  return <>{children}</>;
 };
