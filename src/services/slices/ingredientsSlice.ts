@@ -43,6 +43,9 @@ const ingredientsSlice = createSlice({
   reducers: {
     setSelectedIngredient(state, action: PayloadAction<TIngredient | null>) {
       state.selectedIngredient = action.payload; // Устанавливаем выбранный ингредиент
+    },
+    clearSelectedIngredient(state) {
+      state.selectedIngredient = null; // Очищаем выбранный ингредиент
     }
   },
   extraReducers: (builder) => {
@@ -62,16 +65,16 @@ const ingredientsSlice = createSlice({
         state.loading = false;
         state.error = action.payload as string;
       });
+  },
+  selectors: {
+    getIngredientsSelector(state: IngredientsState) {
+      return [...state.buns, ...state.mains, ...state.sauces];
+    }
   }
 });
-
+export const { getIngredientsSelector } = ingredientsSlice.selectors;
+export { initialState as ingredientsInitialState };
 // Экспортируем действие для выбора ингредиента
 export const { setSelectedIngredient } = ingredientsSlice.actions;
 
 export default ingredientsSlice.reducer;
-
-export const getIngredientsSelector = (state: RootState): TIngredient[] => [
-  ...state.ingredients.buns,
-  ...state.ingredients.mains,
-  ...state.ingredients.sauces
-];
