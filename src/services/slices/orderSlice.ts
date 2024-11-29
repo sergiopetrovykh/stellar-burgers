@@ -42,6 +42,7 @@ const orderSlice = createSlice({
   }
 });
 
+export { initialState as orderInitialState };
 // Селектор для получения состояния `order`
 export const getOrderSelector = (state: { orders: OrderState }) => state.orders;
 

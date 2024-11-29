@@ -3,9 +3,7 @@ import { useSelector } from 'react-redux';
 import { Preloader } from '../ui/preloader';
 import { IngredientDetailsUI } from '../ui/ingredient-details';
 import { useParams } from 'react-router-dom';
-import { RootState } from '../../services/rootReducer';
 import { getIngredientsSelector } from '../../services/slices/ingredientsSlice';
-//import { TIngredient } from '@utils-types'; // Импортируем тип TIngredient
 
 export const IngredientDetails: FC = () => {
   const { id } = useParams<{ id: string }>(); // Получаем id ингредиента из параметров маршрута
@@ -17,6 +15,7 @@ export const IngredientDetails: FC = () => {
   //   ...state.ingredients.sauces
   // ]);
 
+  // Используем мемоизированный селектор
   const allIngredients = useSelector(getIngredientsSelector);
 
   // Ищем ингредиент по id
