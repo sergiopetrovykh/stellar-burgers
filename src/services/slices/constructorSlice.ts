@@ -121,6 +121,7 @@ const constructorSlice = createSlice({
   }
 });
 export const { getConstructorSelector } = constructorSlice.selectors;
+export { initialState as constructorInitialState };
 
 // Экспорт действий
 export const {

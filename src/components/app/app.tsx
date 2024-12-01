@@ -34,6 +34,9 @@ const App = () => {
   // Фоновое состояние для модальных окон
   const background = location.state?.background;
 
+  // Вызов useParams для параметров маршрута
+  const params = useParams();
+
   useEffect(() => {
     dispatch(getUserThunk());
     dispatch(fetchIngredients());
@@ -122,7 +125,7 @@ const App = () => {
             path='/feed/:number'
             element={
               <Modal
-                title={`#${useParams().number}`} // Использование useParams
+                title={`#${params.number}`} // Передача параметров
                 onClose={() => navigate(-1)}>
                 <OrderInfo />
               </Modal>
@@ -132,7 +135,7 @@ const App = () => {
             path='/profile/orders/:number'
             element={
               <Modal
-                title={`#${useParams().number}`} // Использование useParams
+                title={`#${params.number}`} // Передача параметров
                 onClose={() => navigate(-1)}>
                 <OrderInfo />
               </Modal>
