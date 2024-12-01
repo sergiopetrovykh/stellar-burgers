@@ -67,9 +67,11 @@ const ingredientsSlice = createSlice({
       });
   },
   selectors: {
-    getIngredientsSelector(state: IngredientsState) {
-      return [...state.buns, ...state.mains, ...state.sauces];
-    }
+    getIngredientsSelector: (state: IngredientsState): TIngredient[] => [
+      ...state.buns,
+      ...state.mains,
+      ...state.sauces
+    ]
   }
 });
 export const { getIngredientsSelector } = ingredientsSlice.selectors;

@@ -13,7 +13,9 @@ export const OrderCard: FC<OrderCardProps> = memo(({ order }) => {
   const location = useLocation();
 
   // Используем мемоизированный селектор
-  const ingredients: TIngredient[] = useSelector(getIngredientsSelector);
+  const ingredients: TIngredient[] = useSelector((state) =>
+    getIngredientsSelector(state)
+  );
 
   const orderInfo = useMemo(() => {
     if (!ingredients.length) return null;

@@ -116,5 +116,6 @@ export const getIsLoadingSelector = createSelector(
   (feed) => feed.isLoading
 );
 
+export { initialState as feedInitialState };
 // Экспорт редюсера
 export default feedSlice.reducer;
