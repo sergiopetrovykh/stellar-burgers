@@ -1,3 +1,20 @@
+// Константы для селекторов
+const selectors = {
+  topBunPlaceholder: '[data-cy="noTopBun"]',
+  bottomBunPlaceholder: '[data-cy="noBottomBun"]',
+  fillerPlaceholder: '[data-cy="noFiller"]',
+  topBun: '[data-cy="TopBun"]',
+  bottomBun: '[data-cy="BottomBun"]',
+  filler: '[data-cy="Filler"]',
+  modal: '[data-cy="modal"]',
+  modalClose: '[data-cy="modal-close"]',
+  modalOverlay: '[data-cy="modal-overlay"]',
+  bunCard: '[data-cy="Флюоресцентная булка R2-D3"]',
+  sauceCard: '[data-cy="Соус фирменный Space Sauce"]',
+  mainFillingCard: '[data-cy="Биокотлета из марсианской Магнолии"]',
+  orderButton: 'button:contains("Оформить заказ")'
+};
+
 // Переменные для текста
 const addIngredientText = 'Добавить';
 const bunText = 'Флюоресцентная булка R2-D3';
@@ -14,57 +31,51 @@ describe('E2E Тесты на главной странице', function () {
 
   describe('Добавление ингредиентов в конструктор', function () {
     it('Флюоресцентная булка R2-D3 должна добавиться в конструктор', function () {
-      cy.get('[data-cy="noTopBun"]').should('be.visible');
-      cy.get('[data-cy="noBottomBun"]').should('be.visible');
-      cy.get('[data-cy="Флюоресцентная булка R2-D3"]')
-        .contains(addIngredientText)
-        .click();
-      cy.get('[data-cy="TopBun"]').contains(bunText);
-      cy.get('[data-cy="BottomBun"]').contains(bunText);
+      cy.get(selectors.topBunPlaceholder).should('be.visible');
+      cy.get(selectors.bottomBunPlaceholder).should('be.visible');
+      cy.get(selectors.bunCard).contains(addIngredientText).click();
+      cy.get(selectors.topBun).contains(bunText);
+      cy.get(selectors.bottomBun).contains(bunText);
     });
 
     it('Соус фирменный Space Sauce должен добавиться в конструктор', function () {
-      cy.get('[data-cy="noFiller"]').should('be.visible');
-      cy.get('[data-cy="Соус фирменный Space Sauce"]')
-        .contains(addIngredientText)
-        .click();
-      cy.get('[data-cy="Filler"]').contains(sauceText);
+      cy.get(selectors.fillerPlaceholder).should('be.visible');
+      cy.get(selectors.sauceCard).contains(addIngredientText).click();
+      cy.get(selectors.filler).contains(sauceText);
     });
 
     it('Биокотлета из марсианской Магнолии должна добавиться в конструктор', function () {
-      cy.get('[data-cy="noFiller"]').should('be.visible');
-      cy.get(`[data-cy="Биокотлета из марсианской Магнолии"]`)
-        .contains(addIngredientText)
-        .click();
-      cy.get('[data-cy="Filler"]').contains(mainFillingText);
+      cy.get(selectors.fillerPlaceholder).should('be.visible');
+      cy.get(selectors.mainFillingCard).contains(addIngredientText).click();
+      cy.get(selectors.filler).contains(mainFillingText);
     });
   });
 
   describe('Проверка модальных окон', function () {
     it('Открытие модального окна', function () {
-      cy.get('[data-cy="modal"]').should('not.exist');
-      cy.get('[data-cy="Соус фирменный Space Sauce"]').click();
-      cy.get('[data-cy="modal"]').contains(sauceText).should('be.visible');
+      cy.get(selectors.modal).should('not.exist');
+      cy.get(selectors.sauceCard).click();
+      cy.get(selectors.modal).contains(sauceText).should('be.visible');
     });
 
     it('Закрытие модального окна по крестику', function () {
-      cy.get('[data-cy="Соус фирменный Space Sauce"]').click();
-      cy.get('[data-cy="modal"]')
+      cy.get(selectors.sauceCard).click();
+      cy.get(selectors.modal)
         .should('exist')
         .contains(sauceText)
         .should('be.visible');
-      cy.get('[data-cy="modal-close"]').click();
-      cy.get('[data-cy="modal"]').should('not.exist');
+      cy.get(selectors.modalClose).click();
+      cy.get(selectors.modal).should('not.exist');
     });
 
     it('Закрытие модального окна по оверлею', function () {
-      cy.get('[data-cy="Соус фирменный Space Sauce"]').click();
-      cy.get('[data-cy="modal"]')
+      cy.get(selectors.sauceCard).click();
+      cy.get(selectors.modal)
         .should('exist')
         .contains(sauceText)
         .should('be.visible');
-      cy.get('[data-cy="modal-overlay"]').click({ force: true });
-      cy.get('[data-cy="modal"]').should('not.exist');
+      cy.get(selectors.modalOverlay).click({ force: true });
+      cy.get(selectors.modal).should('not.exist');
     });
   });
 
@@ -77,35 +88,29 @@ describe('E2E Тесты на главной странице', function () {
       cy.visit('/');
 
       // Проверяем, что конструктор пуст
-      cy.get('[data-cy="noTopBun"]').should('be.visible');
-      cy.get('[data-cy="noBottomBun"]').should('be.visible');
-      cy.get('[data-cy="noFiller"]').should('be.visible');
+      cy.get(selectors.topBunPlaceholder).should('be.visible');
+      cy.get(selectors.bottomBunPlaceholder).should('be.visible');
+      cy.get(selectors.fillerPlaceholder).should('be.visible');
 
       // Добавляем ингредиенты в конструктор
-      cy.get('[data-cy="Флюоресцентная булка R2-D3"]')
-        .contains(addIngredientText)
-        .click();
-      cy.get('[data-cy="Соус фирменный Space Sauce"]')
-        .contains(addIngredientText)
-        .click();
-      cy.get('[data-cy="Биокотлета из марсианской Магнолии"]')
-        .contains(addIngredientText)
-        .click();
+      cy.get(selectors.bunCard).contains(addIngredientText).click();
+      cy.get(selectors.sauceCard).contains(addIngredientText).click();
+      cy.get(selectors.mainFillingCard).contains(addIngredientText).click();
 
       // Нажимаем кнопку оформления заказа
-      cy.get('button').contains('Оформить заказ').click();
+      cy.get(selectors.orderButton).click();
 
       // Проверяем, что открылась модалка с номером заказа
-      cy.get('[data-cy="modal"]').contains(orderNumber).should('be.visible');
+      cy.get(selectors.modal).contains(orderNumber).should('be.visible');
 
       // Закрываем модалку
-      cy.get('[data-cy="modal-close"]').click();
-      cy.get('[data-cy="modal"]').should('not.exist');
+      cy.get(selectors.modalClose).click();
+      cy.get(selectors.modal).should('not.exist');
 
       // Проверяем, что конструктор очистился
-      cy.get('[data-cy="noTopBun"]').should('be.visible');
-      cy.get('[data-cy="noBottomBun"]').should('be.visible');
-      cy.get('[data-cy="noFiller"]').should('be.visible');
+      cy.get(selectors.topBunPlaceholder).should('be.visible');
+      cy.get(selectors.bottomBunPlaceholder).should('be.visible');
+      cy.get(selectors.fillerPlaceholder).should('be.visible');
 
       // Удаляем токены и проверяем, что тест завершился успешно
       cy.clearCookie('accessToken');
