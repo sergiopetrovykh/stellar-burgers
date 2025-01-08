@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { getFeedsApi, getOrdersApi } from '@api';
-import { TOrder } from '@utils-types';
+import { getFeedsApi, getOrdersApi } from '../../utils/burger-api';
+import { TOrder } from '../../utils/types';
 import { createSelector } from 'reselect';
 import { RootState } from '../store'; // Импорт корневого состояния
 
