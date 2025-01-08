@@ -35,6 +35,6 @@
 //     }
 //   }
 // }
-Cypress.Commands.add('addIngredient', (type) => {
+Cypress.Commands.add('addIngredientToBasket', (type) => {
   cy.get(`[data-cy="${type}"]`).children().first().children('button').click();
 });

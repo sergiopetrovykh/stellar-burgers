@@ -4,10 +4,11 @@ import {
   nanoid,
   PayloadAction
 } from '@reduxjs/toolkit';
-import { TConstructorIngredient, TIngredient, TOrder } from '@utils-types';
-import { orderBurgerApi, getOrderByNumberApi } from '@api';
+import { TConstructorIngredient, TIngredient, TOrder } from '../../utils/types';
+import { orderBurgerApi, getOrderByNumberApi } from '../../utils/burger-api';
 
 export interface constructorState {
+  ingredients: any;
   isLoading: boolean;
   constructorItems: {
     bun: TConstructorIngredient | null;
@@ -18,7 +19,7 @@ export interface constructorState {
   error: string | null;
 }
 
-const initialState: constructorState = {
+export const initialState: constructorState = {
   isLoading: false,
   constructorItems: {
     bun: null,
@@ -26,7 +27,8 @@ const initialState: constructorState = {
   },
   orderRequest: false,
   orderModalData: null,
-  error: null
+  error: null,
+  ingredients: undefined
 };
 
 // Асинхронный thunk для отправки заказа
@@ -35,7 +37,7 @@ export const sendOrderThunk = createAsyncThunk(
   (data: string[]) => orderBurgerApi(data)
 );
 
-const constructorSlice = createSlice({
+export const constructorSlice = createSlice({
   name: 'constructorBurg',
   initialState,
   reducers: {
@@ -69,7 +71,7 @@ const constructorSlice = createSlice({
     },
 
     // Сброс данных модального окна заказа
-    setNullOrderModalData: (state) => {
+    clearOrder: (state) => {
       state.orderModalData = null;
     },
 
@@ -106,7 +108,7 @@ const constructorSlice = createSlice({
       })
       .addCase(sendOrderThunk.rejected, (state, { error }) => {
         state.isLoading = false;
-        state.error = error.message as string;
+        state.error = error.message || 'Не удалось отправить заказ';
       })
       .addCase(sendOrderThunk.fulfilled, (state, { payload }) => {
         state.isLoading = false;
@@ -128,7 +130,7 @@ export const {
   addIngredientToBasket, //добавили ингредиент в корзину
   deleteIngredientFromBasket, //удалили ингредиент из корзины
   setOrderRequest,
-  setNullOrderModalData,
+  clearOrder,
   moveIngredientUp,
   moveIngredientDown
 } = constructorSlice.actions;

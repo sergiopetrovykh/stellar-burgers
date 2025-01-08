@@ -1,62 +1,51 @@
-import { expect, test, describe } from '@jest/globals';
-import { configureStore } from '@reduxjs/toolkit';
-import orderReducer, { getOrderThunk } from './orderSlice';
+import { describe, expect, test } from '@jest/globals';
+import orderReducer, { orderInitialState, getOrderThunk } from './orderSlice';
+import { orderMockData } from './testData';
 
-const setupStore = () =>
-  configureStore({
-    reducer: {
-      order: orderReducer
-    }
+describe('Тесты для orderSlice', () => {
+  test('Состояние ожидания при получении данных заказа (pending)', () => {
+    const expectedState = {
+      ...orderInitialState,
+      isLoading: true,
+      error: null
+    };
+
+    const newState = orderReducer(orderInitialState, {
+      type: getOrderThunk.pending.type
+    });
+
+    expect(newState).toEqual(expectedState);
   });
 
-describe('Тестируем экшены заказа', () => {
-  describe('Получаем данные заказа', () => {
-    test('Ожидаем ответ после получения данных заказа', () => {
-      const store = setupStore();
-      store.dispatch({ type: getOrderThunk.pending.type });
-      const state = store.getState();
-      expect(state.order.isLoading).toBeTruthy();
-      expect(state.order.error).toBeNull();
+  test('Ошибка при получении данных заказа (rejected)', () => {
+    const errorMessage = 'Ошибка загрузки данных заказа';
+    const expectedState = {
+      ...orderInitialState,
+      isLoading: false,
+      error: errorMessage
+    };
+
+    const newState = orderReducer(orderInitialState, {
+      type: getOrderThunk.rejected.type,
+      error: { message: errorMessage }
     });
-    test('Ошибка после получения данных заказа', () => {
-      const store = setupStore();
-      const error = 'mocked error';
-      store.dispatch({
-        type: getOrderThunk.rejected.type,
-        error: { message: error }
-      });
-      const state = store.getState();
-      expect(state.order.isLoading).toBeFalsy();
-      expect(state.order.error).toBe(error);
+
+    expect(newState).toEqual(expectedState);
+  });
+
+  test('Успешное получение данных заказа (fulfilled)', () => {
+    const expectedState = {
+      ...orderInitialState,
+      isLoading: false,
+      error: null,
+      order: orderMockData.orders[0]
+    };
+
+    const newState = orderReducer(orderInitialState, {
+      type: getOrderThunk.fulfilled.type,
+      payload: orderMockData
     });
-    test('Успех после получения данных заказа', () => {
-      const mockedPayload = {
-        orders: [
-          {
-            _id: '6746c05eb27b06001c3eb58f',
-            ingredients: [
-              '643d69a5c3f7b9001cfa093d',
-              '643d69a5c3f7b9001cfa0941',
-              '643d69a5c3f7b9001cfa0943',
-              '643d69a5c3f7b9001cfa093d'
-            ],
-            status: 'done',
-            name: 'Space флюоресцентный био-марсианский бургер',
-            createdAt: '2024-11-27T06:46:54.493Z',
-            updatedAt: '2024-11-27T06:46:55.400Z',
-            number: 60719
-          }
-        ]
-      };
-      const store = setupStore();
-      store.dispatch({
-        type: getOrderThunk.fulfilled.type,
-        payload: mockedPayload
-      });
-      const state = store.getState();
-      expect(state.order.isLoading).toBeFalsy();
-      expect(state.order.error).toBeNull();
-      expect(state.order.order).toEqual(mockedPayload.orders[0]);
-    });
+
+    expect(newState).toEqual(expectedState);
   });
 });

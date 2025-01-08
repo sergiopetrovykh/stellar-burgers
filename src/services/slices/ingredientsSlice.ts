@@ -1,11 +1,11 @@
 // src/services/slices/ingredientsSlice.ts
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { TIngredient } from '@utils-types';
+import { TIngredient } from '../../utils/types';
 import { getIngredientsApi } from '../../utils/burger-api'; // импорт функции из api.ts
 import { RootState } from '../store';
 
 // Определение начального состояния
-interface IngredientsState {
+export interface IngredientsState {
   selectedIngredient: TIngredient | null; // Выбранный ингредиент
   buns: TIngredient[];
   mains: TIngredient[];
@@ -63,7 +63,7 @@ const ingredientsSlice = createSlice({
       })
       .addCase(fetchIngredients.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload as string;
+        state.error = action.error.message || 'Не удалось получить ингредиенты';
       });
   },
   selectors: {

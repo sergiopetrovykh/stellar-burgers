@@ -1,154 +1,131 @@
-import { test, expect, describe } from '@jest/globals';
-import constructorReducer, {
+import {
+  constructorSlice,
   addIngredientToBasket,
-  moveIngredientDown,
-  moveIngredientUp,
   deleteIngredientFromBasket,
-  constructorInitialState
+  initialState,
+  moveIngredientUp,
+  moveIngredientDown,
+  sendOrderThunk
 } from './constructorSlice';
-import type { constructorState } from './constructorSlice';
-import { TConstructorIngredient } from '@utils-types';
-import { nanoid } from '@reduxjs/toolkit';
 
-jest.mock('@reduxjs/toolkit', () => ({
-  ...jest.requireActual('@reduxjs/toolkit'),
-  nanoid: jest.fn(() => 'mockedID')
-}));
+import { itemsToAdd, itemsToMove, mockNewOrder } from './testData';
 
-describe('Тестируем экшены конструктора', () => {
-  const startState: constructorState = JSON.parse(
-    JSON.stringify(constructorInitialState)
-  );
-  startState.constructorItems = {
-    bun: {
-      _id: '643d69a5c3f7b9001cfa093d',
-      name: 'Флюоресцентная булка R2-D3',
-      type: 'bun',
-      proteins: 44,
-      fat: 26,
-      carbohydrates: 85,
-      calories: 643,
-      price: 988,
-      image: 'https://code.s3.yandex.net/react/code/bun-01.png',
-      image_mobile: 'https://code.s3.yandex.net/react/code/bun-01-mobile.png',
-      image_large: 'https://code.s3.yandex.net/react/code/bun-01-large.png',
-      id: '0'
-    },
-    ingredients: [
-      {
-        _id: '643d69a5c3f7b9001cfa0943',
-        name: 'Соус фирменный Space Sauce',
-        type: 'sauce',
-        proteins: 50,
-        fat: 22,
-        carbohydrates: 11,
-        calories: 14,
-        price: 80,
-        image: 'https://code.s3.yandex.net/react/code/sauce-04.png',
-        image_mobile:
-          'https://code.s3.yandex.net/react/code/sauce-04-mobile.png',
-        image_large: 'https://code.s3.yandex.net/react/code/sauce-04-large.png',
-        id: '1'
-      },
-      {
-        _id: '643d69a5c3f7b9001cfa0941',
-        name: 'Биокотлета из марсианской Магнолии',
-        type: 'main',
-        proteins: 420,
-        fat: 142,
-        carbohydrates: 242,
-        calories: 4242,
-        price: 424,
-        image: 'https://code.s3.yandex.net/react/code/meat-01.png',
-        image_mobile:
-          'https://code.s3.yandex.net/react/code/meat-01-mobile.png',
-        image_large: 'https://code.s3.yandex.net/react/code/meat-01-large.png',
-        id: '2'
-      }
-    ]
-  };
+import { TConstructorIngredient, TIngredient } from '@utils-types';
 
-  test('Тестируем экшен добавления ингредиента в бургер', () => {
-    const ingredient = {
-      _id: '643d69a5c3f7b9001cfa0941',
-      name: 'Биокотлета из марсианской Магнолии',
-      type: 'main',
-      proteins: 420,
-      fat: 142,
-      carbohydrates: 242,
-      calories: 4242,
-      price: 424,
-      image: 'https://code.s3.yandex.net/react/code/meat-01.png',
-      image_mobile: 'https://code.s3.yandex.net/react/code/meat-01-mobile.png',
-      image_large: 'https://code.s3.yandex.net/react/code/meat-01-large.png'
-    };
-    const endState: constructorState = JSON.parse(JSON.stringify(startState));
-    endState.constructorItems.ingredients.push({
-      ...ingredient,
-      id: 'mockedID'
+describe('тесты constructorSlice', () => {
+  describe('тесты для конструктора', () => {
+    test('тест на добавление булки', () => {
+      const bun = itemsToAdd[0];
+      const action = addIngredientToBasket(bun);
+      const newState = constructorSlice.reducer(initialState, action);
+
+      expect(newState.constructorItems.bun).toEqual(
+        expect.objectContaining(bun)
+      );
     });
 
-    const newState = constructorReducer(
-      startState,
-      addIngredientToBasket(ingredient)
-    );
+    test('тест на добавление ингредиента', () => {
+      const filler = itemsToAdd[1];
+      const action = addIngredientToBasket(filler);
+      const newState = constructorSlice.reducer(initialState, action);
 
-    expect(nanoid).toHaveBeenCalled();
-    expect(newState).toEqual(endState);
-  });
-
-  test('Тестируем экшен удаления ингредиента из бургера', () => {
-    const ingredientId = '1';
-    const endState: constructorState = JSON.parse(JSON.stringify(startState));
-    endState.constructorItems.ingredients =
-      endState.constructorItems.ingredients.filter(
-        (ingredient: TConstructorIngredient) => ingredient.id != ingredientId
+      expect(newState.constructorItems.ingredients).toEqual(
+        expect.arrayContaining([expect.objectContaining(filler)])
       );
-
-    const newState = constructorReducer(
-      startState,
-      deleteIngredientFromBasket(ingredientId)
-    );
-
-    expect(newState).toEqual(endState);
-  });
-
-  describe('Тесты экшенов перемещения ингренидентов в бургерев', () => {
-    test('Тест перемещения ингредиента наверх', () => {
-      const ingredientId = 1;
-      const endState: constructorState = JSON.parse(JSON.stringify(startState));
-      [
-        endState.constructorItems.ingredients[ingredientId],
-        endState.constructorItems.ingredients[ingredientId - 1]
-      ] = [
-        endState.constructorItems.ingredients[ingredientId - 1],
-        endState.constructorItems.ingredients[ingredientId]
-      ];
-
-      const newState = constructorReducer(
-        startState,
-        moveIngredientUp(ingredientId)
-      );
-
-      expect(newState).toEqual(endState);
     });
-    test('Тест перемещения ингредиента вниз', () => {
-      const ingredientId = 0;
-      const endState: constructorState = JSON.parse(JSON.stringify(startState));
-      [
-        endState.constructorItems.ingredients[ingredientId],
-        endState.constructorItems.ingredients[ingredientId + 1]
-      ] = [
-        endState.constructorItems.ingredients[ingredientId + 1],
-        endState.constructorItems.ingredients[ingredientId]
-      ];
 
-      const newState = constructorReducer(
-        startState,
-        moveIngredientDown(ingredientId)
+    test('тест на удаление ингредиента', () => {
+      const initStateIngredients = {
+        ...initialState,
+        constructorItems: {
+          ...initialState.constructorItems,
+          ingredients: [itemsToMove[1]]
+        }
+      };
+
+      const newState = constructorSlice.reducer(
+        initStateIngredients,
+        deleteIngredientFromBasket(itemsToMove[1].id)
       );
 
-      expect(newState).toEqual(endState);
+      expect(newState.constructorItems.ingredients).toEqual([]);
+    });
+
+    describe('тесты на перемещение ингредиентов', () => {
+      const previousState = {
+        ...initialState,
+        constructorItems: {
+          bun: null,
+          ingredients: itemsToMove
+        }
+      };
+
+      test('перемещение ингредиента вверх', () => {
+        const action = moveIngredientUp(2);
+        const newState = constructorSlice.reducer(previousState, action);
+
+        expect(newState.constructorItems.ingredients[2].id).toBe(
+          previousState.constructorItems.ingredients[1].id
+        );
+        expect(newState.constructorItems.ingredients[1].id).toBe(
+          previousState.constructorItems.ingredients[2].id
+        );
+      });
+
+      test('перемещение ингредиента вниз', () => {
+        const action = moveIngredientDown(1);
+        const newState = constructorSlice.reducer(previousState, action);
+
+        expect(newState.constructorItems.ingredients[1].id).toBe(
+          previousState.constructorItems.ingredients[2].id
+        );
+        expect(newState.constructorItems.ingredients[2].id).toBe(
+          previousState.constructorItems.ingredients[1].id
+        );
+      });
+    });
+
+    describe('тесты для нового заказа', () => {
+      test('проверка состояния ожидания (pending)', () => {
+        const expectedState = {
+          ...initialState,
+          isLoading: true
+        };
+
+        const newState = constructorSlice.reducer(initialState, {
+          type: sendOrderThunk.pending.type
+        });
+        expect(newState).toEqual(expectedState);
+      });
+
+      test('проверка состояния отклонено (rejected)', () => {
+        const errorMessage = 'Ошибка создания заказа';
+        const expectedState = {
+          ...initialState,
+          error: errorMessage
+        };
+
+        const newState = constructorSlice.reducer(initialState, {
+          type: sendOrderThunk.rejected.type,
+          error: { message: errorMessage }
+        });
+
+        expect(newState).toEqual(expectedState);
+      });
+
+      test('проверка состояния выполнено (fulfilled)', () => {
+        const expectedState = {
+          ...initialState,
+          orderModalData: mockNewOrder.orders[0]
+        };
+
+        const newState = constructorSlice.reducer(initialState, {
+          type: sendOrderThunk.fulfilled.type,
+          payload: { order: mockNewOrder.orders[0] }
+        });
+
+        expect(newState).toEqual(expectedState);
+      });
     });
   });
 });

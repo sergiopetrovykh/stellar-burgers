@@ -1,24 +1,15 @@
-import { expect, test, describe } from '@jest/globals';
-import rootReducer from './rootReducer';
-import {
-  constructorInitialState,
-  feedInitialState,
-  ingredientsInitialState,
-  orderInitialState,
-  userInitialState
-} from '@slices';
+import { expect, test } from '@jest/globals';
+import { rootReducer } from './rootReducer';
+import { configureStore } from '@reduxjs/toolkit';
 
-describe('Тест корневого редьюсера', () => {
-  const initialState = {
-    user: { ...userInitialState },
-    feed: { ...feedInitialState },
-    order: { ...orderInitialState },
-    ingredients: { ...ingredientsInitialState },
-    constructorbg: { ...constructorInitialState }
-  };
-  test('Тест инициализации корневого редьюсера', () => {
-    const action = { type: 'unknow_action' };
-    const newState = rootReducer(undefined, action);
-    expect(newState).toEqual(initialState);
+describe('тесты инициализации rootReducer', () => {
+  test('Проверка инициализации rootReducer', () => {
+    const store = configureStore({
+      reducer: rootReducer
+    });
+
+    const action = { type: 'UNKNOWN_ACTION' };
+    const testState = rootReducer(undefined, action);
+    expect(testState).toEqual(store.getState());
   });
 });

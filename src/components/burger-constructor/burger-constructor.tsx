@@ -9,7 +9,7 @@ import {
   isAuthorizedSelector,
   setOrderRequest,
   sendOrderThunk,
-  setNullOrderModalData
+  clearOrder
 } from '@slices';
 
 // Импортируем хук для навигации между страницами.
@@ -58,7 +58,7 @@ export const BurgerConstructor: FC = () => {
     // Сбрасываем состояние запроса на создание заказа.
     dispatch(setOrderRequest(false));
     // и очищаем данные модального окна.
-    dispatch(setNullOrderModalData());
+    dispatch(clearOrder());
   };
 
   // Вычисляем общую цену бургера с помощью useMemo для оптимизации.

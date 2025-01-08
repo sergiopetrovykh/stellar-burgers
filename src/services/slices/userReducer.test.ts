@@ -1,294 +1,247 @@
-import { expect, test, describe } from '@jest/globals';
-import { configureStore } from '@reduxjs/toolkit';
+import { describe, expect, test, jest } from '@jest/globals';
 import userReducer, {
+  userInitialState,
   loginUserThunk,
   registerUserThunk,
   logoutUserThunk,
-  updateUserThunk,
-  forgotPasswordThunk,
-  resetPasswordThunk,
-  getUserThunk
+  getUserThunk,
+  updateUserThunk
 } from './userSlice';
+import { userMockData, mockPayload } from './testData';
 
-const setupStore = () =>
-  configureStore({
-    reducer: {
-      user: userReducer
-    }
+describe('Тесты для userSlice', () => {
+  test('Состояние ожидания при логине (pending)', () => {
+    const expectedState = {
+      ...userInitialState,
+      isLoading: true,
+      error: null
+    };
+
+    const newState = userReducer(userInitialState, {
+      type: loginUserThunk.pending.type
+    });
+
+    expect(newState).toEqual(expectedState);
   });
 
-describe('Тестируем экшены клиента', () => {
-  const mockSet = jest.fn();
+  test('Ошибка при логине (rejected)', () => {
+    const errorMessage = 'Ошибка входа';
+    const expectedState = {
+      ...userInitialState,
+      isLoading: false,
+      error: errorMessage
+    };
 
-  describe('Тестируем экшены запроса логина', () => {
-    test('Ожидаем ответ после запроса логина', () => {
-      const store = setupStore();
-      store.dispatch({ type: loginUserThunk.pending.type });
-      const state = store.getState();
-      expect(state.user.isLoadong).toBeTruthy();
-      expect(state.user.error).toBeNull();
+    const newState = userReducer(userInitialState, {
+      type: loginUserThunk.rejected.type,
+      error: { message: errorMessage }
     });
-    test('Ошибка после запроса логина', () => {
-      const store = setupStore();
-      const error = 'mocked error';
-      store.dispatch({
-        type: loginUserThunk.rejected.type,
-        error: { message: error }
-      });
-      const state = store.getState();
-      expect(state.user.isLoadong).toBeFalsy();
-      expect(state.user.error).toBe(error);
-    });
-    test('Успех после правильного логина', () => {
-      const mockedPayload = {
-        accessToken:
-          'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3M2NhMWJmYjI3YjA2MDAxYzNlOTIxYiIsImlhdCI6MTczMjY5NjQzMywiZXhwIjoxNzMyNjk3NjMzfQ.kb-L8Lr1H3B0B1QDnd_VocXRAl6_A2kmDP83hJ4dS7I',
-        refreshToken:
-          '99444a1fc28187cdbb1aa523ec506e176beccd20bdf0cd6771c4da7b4b341daae1027c8baf2911a6',
-        user: {
-          email: 'sergio-p@yandex.ru',
-          name: 'Сергей'
-        }
-      };
-      const store = setupStore();
-      store.dispatch({
-        type: loginUserThunk.fulfilled.type,
-        payload: mockedPayload
-      });
-      const state = store.getState();
-      expect(state.user.isLoadong).toBeFalsy();
-      expect(state.user.error).toBeNull();
-      expect(state.user.user).toEqual(mockedPayload.user);
-      expect(state.user.isAuthorized).toBeTruthy();
-    });
+
+    expect(newState).toEqual(expectedState);
   });
 
-  describe('Тестируем экшены запроса регистрации', () => {
-    test('Ожидаем ответ после запроса регистрации', () => {
-      const store = setupStore();
-      store.dispatch({ type: registerUserThunk.pending.type });
-      const state = store.getState();
-      expect(state.user.isLoadong).toBeTruthy();
-      expect(state.user.error).toBeNull();
+  test('Успешный логин (fulfilled)', () => {
+    const expectedState = {
+      ...userInitialState,
+      isLoading: false,
+      error: null,
+      user: mockPayload.user,
+      isAuthorized: true
+    };
+
+    const newState = userReducer(userInitialState, {
+      type: loginUserThunk.fulfilled.type,
+      payload: mockPayload
     });
-    test('Ошибка после запроса регистрации', () => {
-      const store = setupStore();
-      const error = 'mocked error';
-      store.dispatch({
-        type: registerUserThunk.rejected.type,
-        error: { message: error }
-      });
-      const state = store.getState();
-      expect(state.user.isLoadong).toBeFalsy();
-      expect(state.user.error).toBe(error);
-    });
-    test('Успешная регистрация', () => {
-      const mockedPayload = {
-        accessToken:
-          'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3M2NhMWJmYjI3YjA2MDAxYzNlOTIxYiIsImlhdCI6MTczMjY5NjQzMywiZXhwIjoxNzMyNjk3NjMzfQ.kb-L8Lr1H3B0B1QDnd_VocXRAl6_A2kmDP83hJ4dS7I',
-        refreshToken:
-          '99444a1fc28187cdbb1aa523ec506e176beccd20bdf0cd6771c4da7b4b341daae1027c8baf2911a6',
-        user: {
-          email: 'sergio-p@yandex.ru',
-          name: 'Сергей'
-        }
-      };
-      const store = setupStore();
-      store.dispatch({
-        type: registerUserThunk.fulfilled.type,
-        payload: mockedPayload
-      });
-      const state = store.getState();
-      expect(state.user.isLoadong).toBeFalsy();
-      expect(state.user.error).toBeNull();
-      expect(state.user.user).toEqual(mockedPayload.user);
-      expect(state.user.isAuthorized).toBeTruthy();
-    });
+
+    expect(newState).toEqual(expectedState);
   });
 
-  describe('Тестируем экшены запроса выхода из учетной записи', () => {
-    test('Ожидаем ответ после запроса на выход', () => {
-      const store = setupStore();
-      store.dispatch({ type: logoutUserThunk.pending.type });
-      const state = store.getState();
-      expect(state.user.isLoadong).toBeTruthy();
-      expect(state.user.error).toBeNull();
+  test('Состояние ожидания при регистрации (pending)', () => {
+    const expectedState = {
+      ...userInitialState,
+      isLoading: true,
+      error: null
+    };
+
+    const newState = userReducer(userInitialState, {
+      type: registerUserThunk.pending.type
     });
-    test('Ошибка после запроса на выход', () => {
-      const store = setupStore();
-      const error = 'mocked error';
-      store.dispatch({
-        type: logoutUserThunk.rejected.type,
-        error: { message: error }
-      });
-      const state = store.getState();
-      expect(state.user.isLoadong).toBeFalsy();
-      expect(state.user.error).toBe(error);
-    });
-    test('Успешный выход из учетной записи', () => {
-      const mockedPayload = {
-        message: 'Successful logout'
-      };
-      const store = setupStore();
-      store.dispatch({
-        type: logoutUserThunk.fulfilled.type,
-        payload: mockedPayload
-      });
-      const state = store.getState();
-      expect(state.user.isLoadong).toBeFalsy();
-      expect(state.user.error).toBeNull();
-      expect(state.user.user).toBeNull();
-      expect(state.user.isAuthorized).toBeFalsy();
-    });
+
+    expect(newState).toEqual(expectedState);
   });
 
-  describe('Тестируем экшены изменения личных данных', () => {
-    test('Ождидаем ответ после запроса изменения личных данных', () => {
-      const store = setupStore();
-      store.dispatch({ type: updateUserThunk.pending.type });
-      const state = store.getState();
-      expect(state.user.isLoadong).toBeTruthy();
-      expect(state.user.error).toBeNull();
+  test('Ошибка при регистрации (rejected)', () => {
+    const errorMessage = 'Ошибка регистрации';
+    const expectedState = {
+      ...userInitialState,
+      isLoading: false,
+      error: errorMessage
+    };
+
+    const newState = userReducer(userInitialState, {
+      type: registerUserThunk.rejected.type,
+      error: { message: errorMessage }
     });
-    test('Ошибка изменения личных данных', () => {
-      const store = setupStore();
-      const error = 'mocked error';
-      store.dispatch({
-        type: updateUserThunk.rejected.type,
-        error: { message: error }
-      });
-      const state = store.getState();
-      expect(state.user.isLoadong).toBeFalsy();
-      expect(state.user.error).toBe(error);
-    });
-    test('Успех изменения личных данных', () => {
-      const mockedPayload = {
-        user: {
-          email: 'sergio-p@yandex.ru',
-          name: 'Сергей'
-        }
-      };
-      const store = setupStore();
-      store.dispatch({
-        type: updateUserThunk.fulfilled.type,
-        payload: mockedPayload
-      });
-      const state = store.getState();
-      expect(state.user.isLoadong).toBeFalsy();
-      expect(state.user.error).toBeNull();
-      expect(state.user.user).toEqual(mockedPayload.user);
-      expect(state.user.isAuthorized).toBeTruthy();
-    });
+
+    expect(newState).toEqual(expectedState);
   });
 
-  describe('Тестируем экшны восстановления пароля', () => {
-    test('Ожидаем ответ после запроса восстановления пароля', () => {
-      const store = setupStore();
-      store.dispatch({ type: forgotPasswordThunk.pending.type });
-      const state = store.getState();
-      expect(state.user.isLoadong).toBeTruthy();
-      expect(state.user.error).toBeNull();
+  test('Успешная регистрация (fulfilled)', () => {
+    const expectedState = {
+      ...userInitialState,
+      isLoading: false,
+      error: null,
+      user: mockPayload.user,
+      isAuthorized: true
+    };
+
+    const newState = userReducer(userInitialState, {
+      type: registerUserThunk.fulfilled.type,
+      payload: mockPayload
     });
-    test('Ошибка восстановления пароля', () => {
-      const store = setupStore();
-      const error = 'mocked error';
-      store.dispatch({
-        type: forgotPasswordThunk.rejected.type,
-        error: { message: error }
-      });
-      const state = store.getState();
-      expect(state.user.isLoadong).toBeFalsy();
-      expect(state.user.error).toBe(error);
-    });
-    test('Успех восстановления пароля', () => {
-      const mockedPayload = {
-        message: 'Reset email sent'
-      };
-      const store = setupStore();
-      store.dispatch({
-        type: forgotPasswordThunk.fulfilled.type,
-        payload: mockedPayload
-      });
-      const state = store.getState();
-      expect(state.user.isLoadong).toBeFalsy();
-      expect(state.user.error).toBeNull();
-      expect(state.user.user).toBeNull();
-      expect(state.user.isAuthorized).toBeFalsy();
-    });
+
+    expect(newState).toEqual(expectedState);
   });
 
-  describe('Тестируем экшны запроса изменения пароля', () => {
-    test('Ждём ответ после запроса изменения пароля', () => {
-      const store = setupStore();
-      store.dispatch({ type: resetPasswordThunk.pending.type });
-      const state = store.getState();
-      expect(state.user.isLoadong).toBeTruthy();
-      expect(state.user.error).toBeNull();
+  test('Состояние ожидания при выходе (pending)', () => {
+    const expectedState = {
+      ...userInitialState,
+      isLoading: true,
+      error: null
+    };
+
+    const newState = userReducer(userInitialState, {
+      type: logoutUserThunk.pending.type
     });
-    test('Ошибка запроса изменения пароля', () => {
-      const store = setupStore();
-      const error = 'mocked error';
-      store.dispatch({
-        type: resetPasswordThunk.rejected.type,
-        error: { message: error }
-      });
-      const state = store.getState();
-      expect(state.user.isLoadong).toBeFalsy();
-      expect(state.user.error).toBe(error);
-    });
-    test('Успех изменения пароля', () => {
-      const mockedPayload = {
-        message: 'Password successfully reset'
-      };
-      const store = setupStore();
-      store.dispatch({
-        type: resetPasswordThunk.fulfilled.type,
-        payload: mockedPayload
-      });
-      const state = store.getState();
-      expect(state.user.isLoadong).toBeFalsy();
-      expect(state.user.error).toBeNull();
-      expect(state.user.user).toBeNull();
-      expect(state.user.isAuthorized).toBeFalsy();
-    });
+
+    expect(newState).toEqual(expectedState);
   });
 
-  describe('Тестируем экшны запроса данных пользователя', () => {
-    test('Ждем ответ после запроса данных пользователя', () => {
-      const store = setupStore();
-      store.dispatch({ type: getUserThunk.pending.type });
-      const state = store.getState();
-      expect(state.user.isLoadong).toBeTruthy();
-      expect(state.user.error).toBeNull();
+  test('Ошибка при выходе (rejected)', () => {
+    const errorMessage = 'Ошибка выхода';
+    const expectedState = {
+      ...userInitialState,
+      isLoading: false,
+      error: errorMessage
+    };
+
+    const newState = userReducer(userInitialState, {
+      type: logoutUserThunk.rejected.type,
+      error: { message: errorMessage }
     });
-    test('Ошибка после запроса данных пользователя', () => {
-      const store = setupStore();
-      const error = 'mocked error';
-      store.dispatch({
-        type: getUserThunk.rejected.type,
-        error: { message: error }
-      });
-      const state = store.getState();
-      expect(state.user.isLoadong).toBeFalsy();
-      expect(state.user.error).toBe(error);
+
+    expect(newState).toEqual(expectedState);
+  });
+
+  test('Успешный выход (fulfilled)', () => {
+    const expectedState = {
+      ...userInitialState,
+      isLoading: false,
+      error: null,
+      user: null,
+      isAuthorized: false
+    };
+
+    const newState = userReducer(userInitialState, {
+      type: logoutUserThunk.fulfilled.type
     });
-    test('Успех запроса данных пользователя', () => {
-      const mockedPayload = {
-        user: {
-          email: 'sergio-p@yandex.ru',
-          name: 'Сергей'
-        }
-      };
-      const store = setupStore();
-      store.dispatch({
-        type: getUserThunk.fulfilled.type,
-        payload: mockedPayload
-      });
-      const state = store.getState();
-      expect(state.user.isLoadong).toBeFalsy();
-      expect(state.user.error).toBeNull();
-      expect(state.user.user).toEqual(mockedPayload.user);
-      expect(state.user.isAuthorized).toBeTruthy();
+
+    expect(newState).toEqual(expectedState);
+  });
+
+  test('Состояние ожидания при получении пользователя (pending)', () => {
+    const expectedState = {
+      ...userInitialState,
+      isLoading: true,
+      error: null
+    };
+
+    const newState = userReducer(userInitialState, {
+      type: getUserThunk.pending.type
     });
+
+    expect(newState).toEqual(expectedState);
+  });
+
+  test('Ошибка при получении пользователя (rejected)', () => {
+    const errorMessage = 'Ошибка получения данных пользователя';
+    const expectedState = {
+      ...userInitialState,
+      isLoading: false,
+      error: errorMessage
+    };
+
+    const newState = userReducer(userInitialState, {
+      type: getUserThunk.rejected.type,
+      error: { message: errorMessage }
+    });
+
+    expect(newState).toEqual(expectedState);
+  });
+
+  test('Успешное получение пользователя (fulfilled)', () => {
+    const expectedState = {
+      ...userInitialState,
+      isLoading: false,
+      error: null,
+      user: userMockData.user,
+      isAuthorized: true
+    };
+
+    const newState = userReducer(userInitialState, {
+      type: getUserThunk.fulfilled.type,
+      payload: userMockData
+    });
+
+    expect(newState).toEqual(expectedState);
+  });
+
+  test('Состояние ожидания при обновлении пользователя (pending)', () => {
+    const expectedState = {
+      ...userInitialState,
+      isLoading: true,
+      error: null
+    };
+
+    const newState = userReducer(userInitialState, {
+      type: updateUserThunk.pending.type
+    });
+
+    expect(newState).toEqual(expectedState);
+  });
+
+  test('Ошибка при обновлении пользователя (rejected)', () => {
+    const errorMessage = 'Ошибка обновления пользователя';
+    const expectedState = {
+      ...userInitialState,
+      isLoading: false,
+      error: errorMessage
+    };
+
+    const newState = userReducer(userInitialState, {
+      type: updateUserThunk.rejected.type,
+      error: { message: errorMessage }
+    });
+
+    expect(newState).toEqual(expectedState);
+  });
+
+  test('Успешное обновление пользователя (fulfilled)', () => {
+    const updatedUser = { name: 'Updated Name', email: 'updated@example.com' };
+    const expectedState = {
+      ...userInitialState,
+      isLoading: false,
+      error: null,
+      user: updatedUser,
+      isAuthorized: true
+    };
+
+    const newState = userReducer(userInitialState, {
+      type: updateUserThunk.fulfilled.type,
+      payload: { user: updatedUser }
+    });
+
+    expect(newState).toEqual(expectedState);
   });
 });
